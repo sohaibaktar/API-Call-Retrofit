@@ -8,8 +8,6 @@ import retrofit2.http.GET;
 
 public interface CallApi {
 
-    @GET("posts")
-    Call<List<model>> getAllData();
 
 
     @GET("search?country=India")
