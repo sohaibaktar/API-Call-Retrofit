@@ -1,12 +1,14 @@
 package com.example.retrofit_nashbud;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -15,34 +17,32 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView tv;
+
+    RecyclerView recyclerView;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        tv = findViewById(R.id.txt);
-        tv.setText("");
 
-        CallApi callapi = retrofitClient.getRetrofit().create(CallApi.class);
-        Call<List<university_model>> call = callapi.getmodels();
+        recyclerView = findViewById(R.id.recview);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+
+        processData();
+    }
+
+    private void processData() {
+        Call<List<university_model>> call = apicontroller.getInstance().getapi().getmodels();
 
         call.enqueue(new Callback<List<university_model>>() {
             @Override
             public void onResponse(Call<List<university_model>> call, Response<List<university_model>> response) {
-                Log.d("TAG", "onResponse: "+response.body());
                 List<university_model> data = response.body();
-                for (int i = 0; i < data.size(); i++) {
-                    tv.append("name: "+data.get(i).getName()+
-                                "\nstate:"+data.get(i).getState_province()+
-                                "\nCountry:"+data.get(i).getState_province()+
-                                "\ncode:"+data.get(i).getAlpha_two_code()+
-                                "\ndomain:"+data.get(i).getDomains()+
-                                "\nweb_pages:"+data.get(i).getWeb_pages()+"\n\n\n");
-                }
-
-
+                myAdapter adapter = new myAdapter(data);
+                recyclerView.setAdapter(adapter);
+                Toast.makeText(MainActivity.this, "Fetch Complete", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -50,8 +50,5 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("TAG", "onFailure: "+t.toString());
             }
         });
-
-
-
     }
 }

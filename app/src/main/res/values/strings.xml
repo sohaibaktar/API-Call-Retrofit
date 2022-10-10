@@ -1,4 +1,8 @@
 <resources>
-    <string name="app_name">retrofit_nashbud</string>
+    <string name="app_name">Onboarding Task</string>
     <string name="demo_text">Demo Text</string>
+    <string name="state_province">state_province:</string>
+    <string name="alpha_two_code">alpha_two_code:</string>
+    <string name="state">State:</string>
+    <string name="name">Name:</string>
 </resources>

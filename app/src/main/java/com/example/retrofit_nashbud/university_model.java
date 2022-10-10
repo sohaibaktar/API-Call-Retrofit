@@ -8,51 +8,28 @@ import java.util.List;
 public class university_model {
 
 
-    String country, name, alpha_two_code;
- private List<String> domains;
- private List<String> web_pages;
+    private String country, name, alpha_two_code;
 
 
     @SerializedName("state-province")
-    String state_province;
-//    ArrayList<web_pages> web_pages;
-//    ArrayList<domains> domains;
-
+    private String state_province;
 
     public university_model() {
     }
 
-    public university_model(String country, String name, String alpha_two_code, List<String> domains, List<String> web_pages, String state_province) {
+    public university_model(String country, String name, String alpha_two_code, String state_province) {
         this.country = country;
         this.name = name;
         this.alpha_two_code = alpha_two_code;
-        this.domains = domains;
-        this.web_pages = web_pages;
         this.state_province = state_province;
     }
 
-    public String getCountry() {
+    public String getCountry(){
         return country;
     }
 
     public void setCountry(String country) {
         this.country = country;
-    }
-
-    public List<String> getWeb_pages() {
-        return web_pages;
-    }
-
-    public void setWeb_pages(List<String> web_pages) {
-        this.web_pages = web_pages;
-    }
-
-    public List<String> getDomains() {
-        return domains;
-    }
-
-    public void setDomains(List<String> domains) {
-        this.domains = domains;
     }
 
     public String getName() {

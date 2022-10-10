@@ -9,10 +9,7 @@ import retrofit2.http.GET;
 public interface CallApi {
 
 
-
     @GET("search?country=India")
-    Call<List<university_model>> getmodels(
-
-    );
+    Call<List<university_model>> getmodels();
 
 }

@@ -53,6 +53,7 @@ public class Save_Data extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_save_data);
 
+
         circleImageView = findViewById(R.id.civ);
         _name = findViewById(R.id.fullName);
         saveData = findViewById(R.id.save_btn);
@@ -105,60 +106,62 @@ public class Save_Data extends AppCompatActivity {
 
     private void saveToFirebase()
     {
+        String name = _name.getText().toString();
+        //Checking name is empty or not
+        if(name.isEmpty()){
+            _name.setError("Enter an full Name");
+            _name.requestFocus();
+            return;
+        }
+        if (filepath!= null) {
+            //progressBar
+            final ProgressDialog dialog = new ProgressDialog(this);
+            dialog.setTitle("File Uploading...");
+            dialog.show();
+            //save to storage
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference uploader = storage.getReference().child("image" + new Random().nextInt(500));
+            uploader.putFile(filepath)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            //fetch image url and save that in realtime db as string
+                            uploader.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    String imageurl = uri.toString();
 
-        //progressBar
-        final ProgressDialog dialog=new ProgressDialog(this);
-        dialog.setTitle("File Uploading...");
-        dialog.show();
-        //save to storage
-        FirebaseStorage storage=FirebaseStorage.getInstance();
-        StorageReference uploader=storage.getReference().child("image1"+new Random().nextInt(50));
-        uploader.putFile(filepath)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>()
-                {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot)
-                    {
-                        //fetch image url and save that in realtime db as string
-                        uploader.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                String imageurl = uri.toString();
-                                String name = _name.getText().toString();
-                                //Checking name is empty or not
-                                if(name.isEmpty()){
-                                    _name.setError("Enter an full Name");
-                                    _name.requestFocus();
-                                    return;
+                                    DatabaseReference root = firebaseDatabase.getReference("nashbud");
+
+                                    data_model obj = new data_model(name, uri.toString());
+                                    root.push().setValue(obj);
+                                    dialog.dismiss();
+                                    Toast.makeText(getApplicationContext(), "File Uploaded", Toast.LENGTH_LONG).show();
+                                    Log.d("TAG", "onSuccess: ");
+
                                 }
-                                DatabaseReference root = firebaseDatabase.getReference("nashbud");
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d("TAG", "onFailure: " + e.toString());
+                                    Toast.makeText(getApplicationContext(), "File not Uploaded", Toast.LENGTH_LONG).show();
+                                }
+                            });
 
-                                data_model obj = new data_model(name,uri.toString());
-                                root.push().setValue(obj);
-                                dialog.dismiss();
-                                Toast.makeText(getApplicationContext(),"File Uploaded",Toast.LENGTH_LONG).show();
-                                Log.d("TAG", "onSuccess: ");
-
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.d("TAG", "onFailure: "+e.toString());
-                                        Toast.makeText(getApplicationContext(),"File not Uploaded",Toast.LENGTH_LONG).show();
-                                    }
-                                });
-
-                    }
-                })
-                //this is just show persentage of uploading in dialog box
-                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot)
-                    {
-                        float percent=(100*taskSnapshot.getBytesTransferred())/taskSnapshot.getTotalByteCount();
-                        dialog.setMessage("Uploaded :"+(int)percent+" %");
-                    }
-                });
+                        }
+                    })
+                    //this is just show persentage of uploading in dialog box
+                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                            float percent = (100 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                            dialog.setMessage("Uploaded :" + (int) percent + " %");
+                        }
+                    });
+        }else{
+            Toast.makeText(Save_Data.this, "Please Select an Image", Toast.LENGTH_LONG).show();
+            Log.d("TAG", "saveToFirebase: choole file");
+        }
     }
 
     @Override
